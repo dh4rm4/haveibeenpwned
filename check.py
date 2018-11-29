@@ -38,33 +38,35 @@ class checkEmail(object):
             resp = urllib.request.urlopen(req)
             return json.loads(resp.read())
         except urllib.error.HTTPError as e:
+            print ("{0}: {1}".format(email, e.code))
             if e.code == 400:
                 raise InvalidEmail("Email address does not appear to be a valid email")
             elif e.code == 429:
                 print("Too many attemps\nTrying again in 1 sec")
                 time.sleep(1)
-                return get_breaches_infos_on_email(email)
+                return self.get_breaches_infos_from_api(email)
             return []
 
-    def adapt_data_for_compromised_email(self):
+    def write_compromised_email_in_file(self):
+        import pdb; pdb.set_trace()
         f = open(self.output_file, 'w')
         for email, websites in self.compromised_email:
             websites = ' | '.join(websites)
             f.write("{0}: [{1}]".format(email, websites))
         f.close()
 
-    @staticmethod
     def run(self):
         f = open(self.input_file, 'r')
         for email in f:
             email = email.strip()
-            result = get_breaches_infos_from_api(email)
+            result = self.get_breaches_infos_from_api(email)
             if result:
                 self.compromised_email.append([email, result])
-            time.sleep(.3500)
+            time.sleep(1)
         f.close()
         self.write_compromised_email_in_file()
 
 
 if __name__ in '__main__':
-    checkEmail.run()
+    check_email = checkEmail()
+    check_email.run()
