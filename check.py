@@ -48,12 +48,20 @@ class checkEmail(object):
             return []
 
     def write_compromised_email_in_file(self):
-        import pdb; pdb.set_trace()
         f = open(self.output_file, 'w')
         for email, websites in self.compromised_email:
             websites = ' | '.join(websites)
-            f.write("{0}: [{1}]".format(email, websites))
+            f.write("{0}: [{1}]\n".format(email, websites))
         f.close()
+
+    def store_compromised_email_infos(self, email, result):
+        if len(result) > 1:
+            websites_names = []
+            for infos in result:
+                websites_names.append(infos['Name'])
+        else:
+            websites_names = [result[0]['Name']]
+        self.compromised_email.append([email, websites_names])
 
     def run(self):
         f = open(self.input_file, 'r')
@@ -61,11 +69,13 @@ class checkEmail(object):
             email = email.strip()
             result = self.get_breaches_infos_from_api(email)
             if result:
-                self.compromised_email.append([email, result])
+                self.store_compromised_email_infos(email, result)
             time.sleep(1)
         f.close()
-        self.write_compromised_email_in_file()
-
+        if len(self.compromised_email):
+            self.write_compromised_email_in_file()
+        else:
+            print("No email from the given list is compromised\nGood job.")
 
 if __name__ in '__main__':
     check_email = checkEmail()
