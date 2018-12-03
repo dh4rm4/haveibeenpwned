@@ -20,7 +20,7 @@ class checkEmail(object):
     And right the output in a file, following the pattern:
     email: [websites_url_source_of_the_leak]
     """
-    input_file = "mail_list.txt"
+    input_file = "email_list.txt"
     output_file = "compromised_email.txt"
     compromised_email = []
 
